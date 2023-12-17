@@ -16,6 +16,8 @@ import form_filler
 
 
 path_to_excel = ".\\test.xlsx"
+starting_row = 0
+ending_row = 0
 
 #Mainwindow 
 class MainWindow(QMainWindow):
@@ -30,12 +32,22 @@ class MainWindow(QMainWindow):
         ##Widgets
         self.central_widget = QWidget()
         self.table_widget = QTableWidget()
-        self.button = QPushButton("Load Patient Data")
-        self.button.clicked.connect(self.load_data)
+        self.button1 = QPushButton('Load Patient Data')
+        self.button1.clicked.connect(self.load_data)
+        self.button2 = QPushButton('Grab selected rows')
+        self.button2.clicked.connect(self.grab_rows)
+        self.button3 = QPushButton('Fill Forms')
+        self.button3.clicked.connect(self.fill_forms)
+        self.button4 = QPushButton('Select All')
+        self.button4.clicked.connect(self.grab_all)
+
         ##Layout
         layout = QVBoxLayout()
         layout.addWidget(self.table_widget)
-        layout.addWidget(self.button)
+        layout.addWidget(self.button1)
+        layout.addWidget(self.button2)
+        layout.addWidget(self.button3)
+        layout.addWidget(self.button4)
         self.central_widget.setLayout(layout)
         
 
@@ -63,6 +75,27 @@ class MainWindow(QMainWindow):
             row_index += 1
         
         self.table_widget.resizeColumnsToContents()
+
+    def grab_rows(self):
+        global ending_row
+        global starting_row
+
+        selected_range = self.table_widget.selectedRanges()[0]
+        starting_index = selected_range.topRow()
+        ending_index = selected_range.bottomRow()
+        ending_row = self.table_widget.item(ending_index,0).text()
+        starting_row = self.table_widget.item(starting_index,0).text()
+
+    def grab_all(self):
+        global ending_row
+        global starting_row
+
+        starting_row = self.table_widget.item(0,0).text()
+        ending_row = self.table_widget.item(self.table_widget.rowCount()-2,0).text()
+        print(ending_row)
+
+    def fill_forms(self):
+        pass
 
 
 
