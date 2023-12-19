@@ -53,7 +53,6 @@ class filler_helper():
         self.driver = webdriver.Chrome()
 
     def __del__(self):
-        time.sleep(5)
         self.driver.quit()
 
     def login(self,username,password):

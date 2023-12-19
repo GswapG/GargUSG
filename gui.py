@@ -68,8 +68,12 @@ class MainWindow(QMainWindow):
 
         self.setCentralWidget(self.central_widget)
         self.showMaximized()
-        path_to_excel , _ = QFileDialog.getOpenFileName(self, "Open PNDT Excel File","", "Excel Files (*.xls*)")
-        self.load_data()
+        try:
+            path_to_excel , _ = QFileDialog.getOpenFileName(self, "Open PNDT Excel File","", "Excel Files (*.xls*)")
+            self.load_data()
+        except:
+            QMessageBox.warning(self, "Warning", "Please select excel file to load data")
+            self.change_excel_file()
 
 
     def load_data(self):
@@ -141,20 +145,30 @@ class MainWindow(QMainWindow):
         print(ending_row)
 
     def fill_forms(self):
-        helper = form_filler.filler_helper()
-        helper.login(username,password)
-        helper.goto_form_f()
+        if(ending_row <= 3 and starting_row <= 3):
+            QMessageBox.warning(self, "Warning", "Please select forms to fill")
+            return
+        try:
+            helper = form_filler.filler_helper()
+            helper.login(username,password)
+            helper.goto_form_f()
 
-        entries = excel_assist.generate_selected_entries(self.list_values,starting_row,ending_row)
-        helper.fill_form(entries[0])
+            entries = excel_assist.generate_selected_entries(self.list_values,starting_row,ending_row)
+            helper.fill_form(entries[0])
+        except:
+            QMessageBox.warning(self,"WARNING!", "Chrome closed unexpectedly")
 
         
 
 
     def change_excel_file(self):
         global path_to_excel
-        path_to_excel , _ = QFileDialog.getOpenFileName(self, "Open PNDT Excel File","", "Excel Files (*.xls*)")
-        self.load_data()
+        try:
+            path_to_excel , _ = QFileDialog.getOpenFileName(self, "Open PNDT Excel File","", "Excel Files (*.xls*)")
+            self.load_data()
+        except:
+            QMessageBox.warning(self, "Warning", "No File Selected")
+            self.change_excel_file()
 
 
 #Driver
