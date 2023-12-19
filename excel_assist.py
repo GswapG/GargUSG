@@ -42,7 +42,7 @@ from datetime import datetime
 path_to_excel = ".\\PNDT excel report NOVEMBER 2023.xlsm"
 values = []
 
-def is_valid_entry(entry): #entry is a tuple containing 15 columns
+def is_valid_entry(entry): #entry is a tuple containing 15 columns + 1 excel row number column
     for col in entry:
         if col == None:
             return False
@@ -57,13 +57,14 @@ def convert_to_format(list_values): #converts values taken from excel file to li
     for value_tuple in list_values:
         temp_tuple = tuple(value_tuple[0:15])
         if is_valid_entry(temp_tuple):
+            temp_tuple = temp_tuple + (list_values.index(value_tuple),)
             values.append(temp_tuple)
     return values
     
 def print_entries(values): #utility function
     for entry in values:
         if is_valid_entry(entry):
-            print(entry[:8])
+            print(entry[-1])
 
 def separate_address_and_phone(address_phone): #returns a tuple (address, phone number)
     phone_number_pattern = re.compile(r'\b\d{10}\b')
@@ -122,7 +123,10 @@ def filter(list_of_tuples,file_name):
             values.append(tuple)
     return values
 
+def generate_selected_entries(list_values,starting_row,ending_row):
+    return list_values[starting_row:ending_row+1]
 
+    
 #testing code    
 if __name__ == "__main__":
     convert_to_format()
