@@ -126,7 +126,30 @@ def filter(list_of_tuples,file_name):
 def generate_selected_entries(list_values,starting_row,ending_row):
     return list_values[starting_row:ending_row+1]
 
-    
+def separate_doctor_name_address(address_name: str) -> tuple:
+    parts = address_name.split(',', 1)
+
+    if len(parts) == 2:
+        # Strip whitespace from both parts
+        name = parts[0].strip()
+        address = parts[1].strip()
+        return (name, address)
+    else:
+        # Handle cases where the input string doesn't have a comma
+        return (address_name.strip(), "")
+
+def parse_ages(ages_string):
+    age_tuples = []
+    age_strings = str(ages_string).split(',')
+    for age_string in age_strings:
+        age_string = str(age_string).strip()
+        year, month = map(int, age_string.split('.'))
+        if year == 0 and month == 0:
+            continue
+        age_tuples.append((year, month))
+
+    return age_tuples
+
 #testing code    
 if __name__ == "__main__":
     convert_to_format()

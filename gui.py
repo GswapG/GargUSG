@@ -148,18 +148,29 @@ class MainWindow(QMainWindow):
         if(ending_row <= 3 and starting_row <= 3):
             QMessageBox.warning(self, "Warning", "Please select forms to fill")
             return
+        entries = excel_assist.generate_selected_entries(self.list_values,starting_row,ending_row)
+        # for entry in entries:
+        #     print(entry)
         try:
-            helper = form_filler.filler_helper()
+            helper = form_filler.filler_helper(self)
             helper.login(username,password)
             helper.goto_form_f()
+            helper.fill_selected_forms(entries)
+        except form_filler.custom_exception as ce:
+            helper.close_driver()
+            if(ce.message == "too long"):
+                self.indicate_took_too_long()
+            else:
+                QMessageBox.warning(self,"WARNING!", "Chrome closed unexpectedly")
 
-            entries = excel_assist.generate_selected_entries(self.list_values,starting_row,ending_row)
-            helper.fill_form(entries[0])
-        except:
-            QMessageBox.warning(self,"WARNING!", "Chrome closed unexpectedly")
-
+    def indicate_forms_filled(self,values):
+        number_of_forms = len(values)
+        first_name = values[0][2]
+        last_name = values[-1][2]
+        QMessageBox.information(self, 'Success!', f'Filled {number_of_forms} forms from "{first_name}" to "{last_name}"')
         
-
+    def indicate_took_too_long(self):
+        QMessageBox.warning(self, "WARNING!", "Form filling failed. Website took too long to respond.")
 
     def change_excel_file(self):
         global path_to_excel
