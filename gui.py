@@ -85,11 +85,11 @@ class MainWindow(QMainWindow):
         self.table_widget.setHorizontalHeaderLabels(column_headers)
         self.list_values = list(sheet.values)
 
-        display_values = excel_assist.convert_to_format(self.list_values)
-        display_values = excel_assist.filter(display_values,path_to_excel)
-        self.table_widget.setRowCount(len(display_values))
+        self.display_values = excel_assist.convert_to_format(self.list_values)
+        self.display_values = excel_assist.filter(self.display_values,path_to_excel)
+        self.table_widget.setRowCount(len(self.display_values))
         row_index = 0
-        for value_tuple in display_values:
+        for value_tuple in self.display_values:
             date = str(value_tuple[1])
             date = datetime.strptime(date, '%Y-%m-%d %H:%M:%S')
             date = date.strftime('%d/%m/%Y')
@@ -148,9 +148,10 @@ class MainWindow(QMainWindow):
         if(ending_row <= 3 and starting_row <= 3):
             QMessageBox.warning(self, "Warning", "Please select forms to fill")
             return
-        entries = excel_assist.generate_selected_entries(self.list_values,starting_row,ending_row)
+        entries = excel_assist.generate_selected_entries(self.list_values,self.display_values,starting_row,ending_row)
+
         # for entry in entries:
-        #     print(entry)
+        #     print(entry[0])
         try:
             helper = form_filler.filler_helper(self)
             helper.login(username,password)

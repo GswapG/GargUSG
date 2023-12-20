@@ -121,8 +121,12 @@ def filter(list_of_tuples,file_name):
             values.append(tuple)
     return values
 
-def generate_selected_entries(list_values,starting_row,ending_row):
-    return list_values[starting_row:ending_row+1]
+def generate_selected_entries(list_values,display_values,starting_row,ending_row):
+    values = []
+    for value in display_values:
+        if int(value[-1]) >= int(starting_row) and int(value[-1]) <= int(ending_row):
+            values.append(list_values[int(value[-1])])
+    return values
 
 def separate_doctor_name_address(address_name: str) -> tuple:
     parts = address_name.split(',', 1)
