@@ -162,6 +162,9 @@ class MainWindow(QMainWindow):
                 self.indicate_took_too_long()
             else:
                 QMessageBox.warning(self,"WARNING!", "Chrome closed unexpectedly")
+        except Exception:
+            helper.close_driver()
+            QMessageBox.critical(self, "WARNING", "Something went wrong while filling a form. Please check website for forms filled")
 
     def indicate_forms_filled(self,values):
         number_of_forms = len(values)
