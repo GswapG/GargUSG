@@ -185,8 +185,14 @@ class filler_helper():
 
         phone_field = self.driver.find_element(By.XPATH, '//*[@id="step-1"]/div[8]/div/input')
         phone_field.click()
-        if entry[7] != '0.0' or entry[8] != '0.0':
-            children_tuple = (entry[7],entry[8])
+
+        if int(entry[7]) != 0 or int(entry[8]) != 0:
+            if int(entry[7]) == 0:
+                children_tuple = ('0.0',str(entry[16]))
+            elif int(entry[8]) == 0:
+                children_tuple = (str(entry[15]),'0.0')
+            else:
+                children_tuple = (str(entry[15]),str(entry[16]))
             print(children_tuple)
             self.fill_children(children_tuple)
         

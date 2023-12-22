@@ -25,6 +25,9 @@ QMessageBox{
     font-size: 40px;
 }
 
+QLabel{
+    font-size: 40px;
+}
 
 QTableWidget {
     border: 2px solid #000000;
@@ -42,6 +45,12 @@ QTableWidget::item {
 QTableWidget::item:selected {
     background-color: #3498db;
     color: white;
+}
+
+QLineEdit{
+    font-size: 40px;
+    padding: 5px;
+    margin: 10px;
 }
 
 QHeaderView::section {

@@ -10,39 +10,51 @@ from PyQt5.QtWidgets import(
     QHBoxLayout,
     QFileDialog,
     QMessageBox,
+    QDialog
 )
 from PyQt5.QtCore import QSize, Qt
-from PyQt5.QtGui import QPixmap
+from PyQt5.QtGui import QPixmap, QIcon
 import sys
 import openpyxl
 import form_filler
 import excel_assist
+import gui_utils
+import credential_manager
 from datetime import datetime
 
 path_to_excel = ".\\PNDT excel report NOVEMBER 2023.xlsm"
 path_to_stylesheet = '.\stylesheet.css'
+credentials_filename = 'credentials.bin'
 starting_row = 3
 ending_row = 3
-username = '102237'
-password = 'flutrol70g'
+
+done_with_credentials = True
+username = ''
+password = ''
+
+if credential_manager.credentials_exist(credentials_filename):
+    username, password = credential_manager.get_credentials(credentials_filename)
 
 #Mainwindow 
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
+        global username
+        global password
         global path_to_excel
         self.list_values = []
         ##Window properties
         minSize = QSize(1000,800) #Change to change minimum window size
         self.setWindowTitle("PyariBitiya Form F")
+        self.setWindowIcon(QIcon('logo.png'))
         self.setMinimumSize(minSize)
 
         ##Widgets
         self.central_widget = QWidget()
         self.table_widget = QTableWidget()
         self.table_widget.itemSelectionChanged.connect(self.grab_rows)
-        self.load_button = QPushButton('Load Patient Data')
-        self.load_button.clicked.connect(self.load_data)
+        self.credentials_button = QPushButton('Change Credentials')
+        self.credentials_button.clicked.connect(self.change_credentials)
         self.select_button = QPushButton('Grab selected rows')
         self.select_button.clicked.connect(self.grab_rows)
         self.fill_form_button = QPushButton('Fill Forms')
@@ -60,6 +72,7 @@ class MainWindow(QMainWindow):
         # layout1.addWidget(self.load_button)
         # layout1.addWidget(self.select_button)
         layout1.addWidget(self.label)
+        layout1.addWidget(self.credentials_button)
         layout1.addWidget(self.change_file_button)
         layout1.addWidget(self.fill_form_button)
         layout2.addLayout(layout1)
@@ -68,13 +81,30 @@ class MainWindow(QMainWindow):
 
         self.setCentralWidget(self.central_widget)
         self.showMaximized()
+        flag = True
+        while flag:
+            if not credential_manager.credentials_exist(credentials_filename):
+                QMessageBox.warning(self, "WARNING", "You need to enter login credentials as they do not exist!")
+                if credential_manager.create_credentials(self,credentials_filename):
+                    flag = False
+                    username, password = credential_manager.get_credentials(credentials_filename)
+                else:
+                    QMessageBox.warning(self, "WARNING", "You need to enter login credentials as they do not exist!")
+            else:
+                flag = False
+
         try:
-            path_to_excel , _ = QFileDialog.getOpenFileName(self, "Open PNDT Excel File","", "Excel Files (*.xls*)")
+            flag = True
+            while flag:
+                path_to_excel , _ = QFileDialog.getOpenFileName(self, "Open PNDT Excel File","", "Excel Files (*.xls*)")
+                if excel_assist.validate_path(path_to_excel):
+                    flag = False
+                else:
+                    QMessageBox.warning(self, "Warning", "Please select a valid PNDT file!!")
             self.load_data()
         except:
             QMessageBox.warning(self, "Warning", "Please select excel file to load data")
             self.change_excel_file()
-
 
     def load_data(self):
         workbook = openpyxl.load_workbook(path_to_excel)
@@ -149,7 +179,12 @@ class MainWindow(QMainWindow):
             QMessageBox.warning(self, "Warning", "Please select forms to fill")
             return
         entries = excel_assist.generate_selected_entries(self.list_values,self.display_values,starting_row,ending_row)
-
+        first_name = entries[0][2]
+        last_name = entries[-1][2]
+        no_of_forms = len(entries)
+        dialog = gui_utils.ConfirmDialog(first_name,last_name,no_of_forms)
+        if dialog.exec_() != QDialog.Accepted:
+            return
         # for entry in entries:
         #     print(entry[0])
         try:
@@ -179,12 +214,28 @@ class MainWindow(QMainWindow):
     def change_excel_file(self):
         global path_to_excel
         try:
-            path_to_excel , _ = QFileDialog.getOpenFileName(self, "Open PNDT Excel File","", "Excel Files (*.xls*)")
+            flag = True
+            while flag:
+                path_to_excel , _ = QFileDialog.getOpenFileName(self, "Open PNDT Excel File","", "Excel Files (*.xls*)")
+                if excel_assist.validate_path(path_to_excel):
+                    flag = False
+                else:
+                    QMessageBox.warning(self, "Warning", "Please select a valid PNDT file!!")
+
             self.load_data()
         except:
             QMessageBox.warning(self, "Warning", "No File Selected")
             self.change_excel_file()
 
+    def change_credentials(self):
+        global username
+        global password
+        if credential_manager.create_credentials(self,credentials_filename):
+            QMessageBox.information(self, "Done", "New credentials saved successfully!")
+            username, password = credential_manager.get_credentials(credentials_filename)
+        else:
+            QMessageBox.information(self, "Alright", "Still on old credentials.")
+        print(username, password)
 
 #Driver
 if __name__ == "__main__":

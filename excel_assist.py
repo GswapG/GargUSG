@@ -19,8 +19,8 @@ from datetime import datetime
 # 12 MTP ADVISED?
 # 13 DATE OF MTP
 # 14 DONE BY
-# 15 None
-# 16 None
+# 15 MALE CHILDREN
+# 16 FEMALE CHILDREN
 # 17 None
 # 18 None
 # 19 None
@@ -145,13 +145,27 @@ def parse_ages(ages_string):
     age_strings = str(ages_string).split(',')
     for age_string in age_strings:
         age_string = str(age_string).strip()
-        year, month = map(int, age_string.split('.'))
+        if '.' in age_string:
+            year, month = map(int, age_string.split('.'))
+        else:
+            year = int(age_string)
+            month = 0
         if year == 0 and month == 0:
             continue
         age_tuples.append((year, month))
 
     return age_tuples
 
+def validate_path(path:str)->bool:
+    file_name = os.path.basename(path)
+    pattern = re.compile(r'(?i)PNDT\s*excel\s*report\s*(\b(?:jan(?:uary)?|feb(?:ruary)?|mar(?:ch)?|apr(?:il)?|may|jun(?:e)?|jul(?:y)?|aug(?:ust)?|sep(?:tember)?|oct(?:ober)?|nov(?:ember)?|dec(?:ember)?)\b)\s*(\d{4})')
+     
+    match = pattern.search(file_name)
+    if match:
+        return True
+    else:
+        return False
+    
 #testing code    
 if __name__ == "__main__":
     convert_to_format()
