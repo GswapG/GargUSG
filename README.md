@@ -19,7 +19,7 @@ This application uses that data to fill the online forms for each patient, as se
 1. When the application is opened for the first time, it asks for the user's login credentials for the online portal.
 2. These credentials are stored for future use in a binary file.
 3. Application asks the user to select a valid excel file that contains the data to be filled.
-   The Excel files have a fixed data scheme and a name pattern 'PNDT excel file <month> <year>'
+   The Excel files have a fixed data scheme and a name pattern 'PNDT excel file _month_ _year_'
 4. Data for the month is shown to the user in a table, from which user can select which entries are to be filled online.
 5. User presses the 'Fill forms' button and press 'Okay' on the confirmation dialog, following which selenium takes over and 
 starts filling the forms one by one. 
