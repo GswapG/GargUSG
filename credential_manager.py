@@ -1,7 +1,6 @@
 import pickle
-import os
+import os,sys
 from PyQt5.QtWidgets import(
-    QMessageBox,
     QDialog, 
     QVBoxLayout, 
     QHBoxLayout, 
@@ -11,8 +10,24 @@ from PyQt5.QtWidgets import(
 )
 from PyQt5.QtCore import QSize
 
-def credentials_exist(filename):
-    file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), filename)
+def get_credentials_path(filename):
+    """ Get the path to the credentials file, works for both dev and bundled app """
+    if getattr(sys, 'frozen', False):
+        # We are running in a PyInstaller bundle
+        # Use a user directory (e.g., appdata, home directory)
+        base_path = os.path.join(os.path.expanduser('~'), 'GargGUCFormFiller')
+    else:
+        # We are running in a normal Python environment
+        base_path = os.path.dirname(os.path.abspath(__file__))
+
+    # Ensure base_path exists
+    if not os.path.exists(base_path):
+        os.makedirs(base_path)
+
+    # Path to credentials.bin
+    return os.path.join(base_path, filename)
+
+def credentials_exist(file_path):
     if os.path.exists(file_path):
         return True
     else:
@@ -67,7 +82,7 @@ class CredentialDialog(QDialog):
     def getInputs(self):
         return self.lineEdit_id.text(), self.lineEdit_password.text()
 
-def create_credentials(parent_window,filename):
+def create_credentials(filename):
     dialog = CredentialDialog()
     if dialog.exec_() == QDialog.Accepted:
         login_id, password = dialog.getInputs()

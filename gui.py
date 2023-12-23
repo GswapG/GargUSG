@@ -14,7 +14,7 @@ from PyQt5.QtWidgets import(
 )
 from PyQt5.QtCore import QSize, Qt
 from PyQt5.QtGui import QPixmap, QIcon
-import sys
+import sys, os
 import openpyxl
 import form_filler
 import excel_assist
@@ -22,18 +22,31 @@ import gui_utils
 import credential_manager
 from datetime import datetime
 
-path_to_excel = ".\\PNDT excel report NOVEMBER 2023.xlsm"
-path_to_stylesheet = '.\stylesheet.css'
+try: 
+  from ctypes import windll # Only exists on Windows.
+  myappid = "com.gargGUC.pyaribitiya.automaticformfiller.1" 
+  windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
+except ImportError:
+  pass
+
+path_to_excel = "PNDT excel report NOVEMBER 2023.xlsm"
+stylesheet = 'stylesheet.css'
 credentials_filename = 'credentials.bin'
+credentials_path = credential_manager.get_credentials_path(credentials_filename)
 starting_row = 3
 ending_row = 3
-
 done_with_credentials = True
 username = ''
 password = ''
 
-if credential_manager.credentials_exist(credentials_filename):
-    username, password = credential_manager.get_credentials(credentials_filename)
+def resource_path(relative_path):
+    base_path = os.path.dirname(__file__)
+    return os.path.join(base_path, relative_path)
+
+if credential_manager.credentials_exist(credentials_path):
+    username, password = credential_manager.get_credentials(credentials_path)
+
+
 
 #Mainwindow 
 class MainWindow(QMainWindow):
@@ -46,7 +59,6 @@ class MainWindow(QMainWindow):
         ##Window properties
         minSize = QSize(1000,800) #Change to change minimum window size
         self.setWindowTitle("PyariBitiya Form F")
-        self.setWindowIcon(QIcon('logo.png'))
         self.setMinimumSize(minSize)
 
         ##Widgets
@@ -62,7 +74,7 @@ class MainWindow(QMainWindow):
         self.change_file_button = QPushButton('Change Excel File')
         self.change_file_button.clicked.connect(self.change_excel_file)
         self.label = QLabel()
-        pixmap = QPixmap('.\girl_logo.png')
+        pixmap = QPixmap(resource_path('girl_logo.png'))
         pixmap = pixmap.scaled(int(pixmap.width()/2.4), int(pixmap.height()/2.4))
         self.label.setPixmap(pixmap)
         ##Layout
@@ -83,11 +95,11 @@ class MainWindow(QMainWindow):
         self.showMaximized()
         flag = True
         while flag:
-            if not credential_manager.credentials_exist(credentials_filename):
+            if not credential_manager.credentials_exist(credentials_path):
                 QMessageBox.warning(self, "WARNING", "You need to enter login credentials as they do not exist!")
-                if credential_manager.create_credentials(self,credentials_filename):
+                if credential_manager.create_credentials(credentials_path):
                     flag = False
-                    username, password = credential_manager.get_credentials(credentials_filename)
+                    username, password = credential_manager.get_credentials(credentials_path)
                 else:
                     QMessageBox.warning(self, "WARNING", "You need to enter login credentials as they do not exist!")
             else:
@@ -230,9 +242,9 @@ class MainWindow(QMainWindow):
     def change_credentials(self):
         global username
         global password
-        if credential_manager.create_credentials(self,credentials_filename):
+        if credential_manager.create_credentials(credentials_path):
             QMessageBox.information(self, "Done", "New credentials saved successfully!")
-            username, password = credential_manager.get_credentials(credentials_filename)
+            username, password = credential_manager.get_credentials(credentials_path)
         else:
             QMessageBox.information(self, "Alright", "Still on old credentials.")
         print(username, password)
@@ -240,7 +252,8 @@ class MainWindow(QMainWindow):
 #Driver
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    with open(path_to_stylesheet, 'r') as file:
+    app.setWindowIcon(QIcon(resource_path('logo.png')))
+    with open(resource_path(stylesheet), 'r') as file:
         app.setStyleSheet(file.read())
     window = MainWindow()
     window.showMaximized()

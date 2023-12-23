@@ -19,7 +19,6 @@ class ConfirmDialog(QDialog):
 
     def initUI(self):
         self.setWindowTitle("Confirmation")
-        self.setWindowIcon(QIcon('logo.png'))
         layout = QVBoxLayout()
         button_layout = QHBoxLayout()
         label = QLabel(f"Filling {self.number} form(s) from '{self.first}' to '{self.last}', do you wish to proceed?")
