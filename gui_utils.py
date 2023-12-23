@@ -7,6 +7,7 @@ from PyQt5.QtWidgets import(
     QPushButton, 
     QLabel
 )
+from PyQt5.QtGui import QIcon
 
 class ConfirmDialog(QDialog):
     def __init__(self,first,last,number):
@@ -18,6 +19,7 @@ class ConfirmDialog(QDialog):
 
     def initUI(self):
         self.setWindowTitle("Confirmation")
+        self.setWindowIcon(QIcon('logo.png'))
         layout = QVBoxLayout()
         button_layout = QHBoxLayout()
         label = QLabel(f"Filling {self.number} form(s) from '{self.first}' to '{self.last}', do you wish to proceed?")
