@@ -33,7 +33,7 @@ Many different scenarios have been thought through and appropriate error handlin
 
 ## How does it work?
 
-The program front-end i built on 'PyQt5', while the backend uses 'openpyxl' to deal with the excel file and 'selenium' webdriver (which is primarily used for testing purposes) to take control of a chrome session that fills in the data in appropriate fields. 
+The program front-end is built on 'PyQt5', while the backend uses 'openpyxl' to deal with the excel file and 'selenium' webdriver (which is primarily used for testing purposes) to take control of a chrome session that fills the data in appropriate fields. 
 
 ## How to run this?
 
