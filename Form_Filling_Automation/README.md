@@ -1,12 +1,3 @@
-# What is this repository?
-
-I am using this repository as the collection spot for all applications and scripts i write to aid my Father.\
-All scripts and application present here are quick-and-dirty projects i do whenever i find some free time, so keep in mind the code here is NOT pretty 🤧.\
-For now, this repository contains 1 application(s) and 2 script(s), as follows:
-- Applications 
-   1. Form Filling Automation
-- Scripts
-   1. backupCreation and backupRestore
 # Form Filling Automation
 
 Using Python and Selenium to automate a boring administrative task.
@@ -39,7 +30,7 @@ The program front-end is built on 'PyQt5', while the backend uses 'openpyxl' to 
 
 ## How to run this?
 
-### Using the python interpreter
+### 1. Using the python interpreter
 You need following python dependencies installed:
 
 ```
@@ -54,7 +45,7 @@ A 'sample.xlsx' file is included for with the file specifying the columns in the
 
 Finally, to run the application, run 'gui.py'.
 
-### Using the final executable provided
+### 2. Using the final executable provided
 
 Unzip [AutomaticFormFiller.zip](packaged_applications/AutomaticFormFiller.zip) and run <b>FormFiller.exe</b>
 
