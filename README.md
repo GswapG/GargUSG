@@ -37,6 +37,7 @@ The program front-end is built on 'PyQt5', while the backend uses 'openpyxl' to 
 
 ## How to run this?
 
+### Using the python interpreter
 You need following python dependencies installed:
 
 ```
@@ -50,3 +51,8 @@ You will also need a valid Excel file for this to work.\
 A 'sample.xlsx' file is included for with the file specifying the columns in the file.
 
 Finally, to run the application, run 'gui.py'.
+
+### Using the final executable provided
+
+Unzip [AutomaticFormFiller.zip](packaged_applications/AutomaticFormFiller.zip) and run <b>FormFiller.exe</b>
+
