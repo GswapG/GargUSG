@@ -117,7 +117,6 @@ class filler_helper():
                 add_form_button = self.driver.find_element(By.XPATH, '//*[@id="profile-tab"]')
                 add_form_button.click()
                 self.fill_form(entry)
-        self.parent_window.indicate_forms_filled(values)
 
     def fill_children(self, children:tuple):
         male_children, female_children = children

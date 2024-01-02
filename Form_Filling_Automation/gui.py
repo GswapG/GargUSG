@@ -12,7 +12,7 @@ from PyQt5.QtWidgets import(
     QMessageBox,
     QDialog
 )
-from PyQt5.QtCore import QSize, Qt
+from PyQt5.QtCore import QSize, Qt, QThread, pyqtSignal
 from PyQt5.QtGui import QPixmap, QIcon
 import sys, os
 import openpyxl
@@ -46,6 +46,33 @@ def resource_path(relative_path):
 if credential_manager.credentials_exist(credentials_path):
     username, password = credential_manager.get_credentials(credentials_path)
 
+class SeleniumThread(QThread):
+    finished = pyqtSignal(list)
+    something_went_wrong = pyqtSignal()
+    warning = pyqtSignal()
+    too_long = pyqtSignal()
+
+    def __init__(self,entries,parentWindow):
+        super().__init__()
+        self.entries = entries
+        self.parentWindow = parentWindow
+
+    def run(self):
+        try:
+            helper = form_filler.filler_helper(self.parentWindow)
+            helper.login(username,password)
+            helper.goto_form_f()
+            helper.fill_selected_forms(self.entries)
+            self.finished.emit(self.entries)
+        except form_filler.custom_exception as ce:
+            helper.close_driver()
+            if(ce.message == "too long"):
+                self.too_long.emit()
+            else:
+                self.warning.emit()
+        except Exception:
+            helper.close_driver()
+            self.something_went_wrong.emit()
 
 
 #Mainwindow 
@@ -197,29 +224,25 @@ class MainWindow(QMainWindow):
         dialog = gui_utils.ConfirmDialog(first_name,last_name,no_of_forms)
         if dialog.exec_() != QDialog.Accepted:
             return
-        # for entry in entries:
-        #     print(entry[0])
-        try:
-            helper = form_filler.filler_helper(self)
-            helper.login(username,password)
-            helper.goto_form_f()
-            helper.fill_selected_forms(entries)
-        except form_filler.custom_exception as ce:
-            helper.close_driver()
-            if(ce.message == "too long"):
-                self.indicate_took_too_long()
-            else:
-                QMessageBox.warning(self,"WARNING!", "Chrome closed unexpectedly")
-        except Exception:
-            helper.close_driver()
-            QMessageBox.critical(self, "WARNING", "Something went wrong while filling a form. Please check website for forms filled")
+        self.selenium_thread = SeleniumThread(entries, self)
+        self.selenium_thread.something_went_wrong.connect(self.indicate_something_went_wrong)
+        self.selenium_thread.warning.connect(self.indicate_warning)
+        self.selenium_thread.too_long.connect(self.indicate_took_too_long)
+        self.selenium_thread.finished.connect(self.indicate_forms_filled)
+        self.selenium_thread.start()
 
     def indicate_forms_filled(self,values):
         number_of_forms = len(values)
         first_name = values[0][2]
         last_name = values[-1][2]
         QMessageBox.information(self, 'Success!', f'Filled {number_of_forms} forms from "{first_name}" to "{last_name}"')
-        
+    
+    def indicate_something_went_wrong(self):
+        QMessageBox.critical(self, "WARNING", "Something went wrong while filling a form. Please check website for forms filled")
+    
+    def indicate_warning(self):
+        QMessageBox.warning(self,"WARNING!", "Chrome closed unexpectedly")
+
     def indicate_took_too_long(self):
         QMessageBox.warning(self, "WARNING!", "Form filling failed. Website took too long to respond.")
 
