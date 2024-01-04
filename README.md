@@ -7,3 +7,9 @@ For now, this repository contains 1 application(s) and 2 script(s), as follows:
    1. Form Filling Automation
 - Scripts
    1. backupCreation and backupRestore
+
+# Preview Images for some applications
+
+## Form Filler
+
+![Form Filler ScreenShot](https://github.com/GswapG/GargUSG/blob/main/images/formfiller.png)
